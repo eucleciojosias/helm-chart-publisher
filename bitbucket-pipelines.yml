@@ -1,0 +1,30 @@
+image:
+  name: atlassian/pipelines-awscli:latest
+
+pipelines:
+  branches:
+    main:
+    - step:
+        name: Build and Push
+        condition:
+          changesets:
+            includePaths:
+              - ".dockerignore"
+              - "Dockerfile"
+              - "pack.sh"
+              - "pipe.yml"
+        script:
+        - IMAGE_NAME=public.ecr.aws/example/$BITBUCKET_REPO_SLUG
+        - IMAGE_TAG=latest
+        - |
+          aws ecr get-login-password --region us-east-1 | docker login \
+            --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+        - docker build -t "$IMAGE_NAME:$IMAGE_TAG" .
+        - |
+          aws ecr-public get-login-password --region us-east-1 | docker login \
+            --username AWS --password-stdin public.ecr.aws
+          aws ecr-public describe-repositories --repository-names ${BITBUCKET_REPO_SLUG} ||
+            aws ecr-public create-repository --repository-name $BITBUCKET_REPO_SLUG
+        - docker push "$IMAGE_NAME:$IMAGE_TAG"
+        services:
+          - docker

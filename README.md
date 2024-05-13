@@ -1,29 +1,30 @@
-# README #
+# Helm Chart Publisher
 
-This README would normally document whatever steps are necessary to get your application up and running.
+The pipe will:
 
-### What is this repository for? ###
+- check if has any chart change in the last commit
+- for each chart changed:
+  - will increase a minor version from the last pacakge
+  - will generate a new package into `packaged/`
+- update the helm repo index
+- commit the new packages and the new index
+- push to the current branch
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+## YAML Definition
 
-### How do I get set up? ###
+Add the following snippet to the script section of your `bitbucket-pipelines.yml` file:
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+```yaml
+- pipe: example-org/helm-chart-publisher:main
+```
 
-### Contribution guidelines ###
+## Variables
 
-* Writing tests
-* Code review
-* Other guidelines
+| Variable            | Usage                                                                                             |
+|---------------------|---------------------------------------------------------------------------------------------------|
 
-### Who do I talk to? ###
+> _(*) = required variable. This variable needs to be specified always when using the pipe._
 
-* Repo owner or admin
-* Other community or team contact
+> _(**) = required variable. If this variable is configured as a repository, account or environment variable, it doesn't need to be declared in the pipe as it will be taken from the context. It can still be overridden when using the pipe._
+
+---
