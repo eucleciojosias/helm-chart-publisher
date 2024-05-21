@@ -40,7 +40,7 @@ for chart_dir in $changed_dirs; do
   version=$(helm show chart "$chart_dir" | grep version | cut -d ' ' -f2)
   echo "OLD VERSION: $version"
 
-  new_minor=$(echo "$version" | cut -d '.' -f3 | printf %d)
+  new_minor=$(echo "$version" | cut -d '.' -f3)
   new_minor=$(expr $new_minor + 1)
   new_version="${version%\.*}.${new_minor}"
   yq -yi ".version = \"$new_version\"" "$chart_dir/Chart.yaml"
@@ -62,4 +62,6 @@ helm repo index packaged
 git add packaged
 last_commit_sha=$(git rev-parse --short HEAD)
 git commit -m "Auto released package from: $last_commit_sha" --author="Helm Chart Publisher Automation <autobot@example.com>"
+
+git config http.${BITBUCKET_GIT_HTTP_ORIGIN}.proxy http://host.docker.internal:29418/
 git push origin $BITBUCKET_BRANCH
