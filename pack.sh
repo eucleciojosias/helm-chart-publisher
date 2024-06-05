@@ -12,8 +12,10 @@ printf "
 
 git config --global --add safe.directory /opt/atlassian/pipelines/agent/build
 
+autobot_commit="Auto released package"
+
 last_commit=$(git log --pretty=format:%s -1)
-if [[ $last_commit == *"Auto released package"* ]]; then
+if [[ $last_commit == *"$autobot_commit"* ]]; then
   echo "Autobot commit, skipped!"
   exit 0
 fi
@@ -46,6 +48,9 @@ for chart_dir in $changed_dirs; do
   new_minor=$(echo "$version" | cut -d '.' -f3)
   new_minor=$(expr $new_minor + 1)
   new_version="${version%\.*}.${new_minor}"
+  if [[ "$BITBUCKET_BRANCH" == "develop" ]]; then
+    new_version="$new_version-alpha" # prerelease
+  fi
   yq -yi ".version = \"$new_version\"" "$chart_dir/Chart.yaml"
   git add "$chart_dir/Chart.yaml"
 
@@ -62,9 +67,11 @@ if [[ "$(git status)" == *"nothing to commit"* ]]; then
 fi
 
 helm repo index packaged
-git add packaged
-last_commit_sha=$(git rev-parse --short HEAD)
-git commit -m "Auto released package from: $last_commit_sha" --author="Helm Chart Publisher Automation <autobot@example.com>"
+if [[ "$BITBUCKET_BRANCH" == "master" ]]; then
+  git add packaged
+  last_commit_sha=$(git rev-parse --short HEAD)
+  git commit -m "$autobot_commit from: $last_commit_sha" --author="Helm Chart Publisher Automation <autobot@example.com>"
 
-git config http.${BITBUCKET_GIT_HTTP_ORIGIN}.proxy http://host.docker.internal:29418/
-git push origin $BITBUCKET_BRANCH
+  git config http.${BITBUCKET_GIT_HTTP_ORIGIN}.proxy http://host.docker.internal:29418/
+  git push origin $BITBUCKET_BRANCH
+fi
