@@ -45,7 +45,7 @@ for chart_dir in $changed_dirs; do
   version=$(helm show chart "$chart_dir" | grep version | cut -d ' ' -f2)
   echo "OLD VERSION: $version"
 
-  new_minor=$(echo "$version" | cut -d '.' -f3)
+  new_minor=$(echo "$version" | cut -d '.' -f3 | cut -d '-' -f1)
   new_minor=$(expr $new_minor + 1)
   new_version="${version%\.*}.${new_minor}"
   if [[ "$BITBUCKET_BRANCH" == "develop" ]]; then
