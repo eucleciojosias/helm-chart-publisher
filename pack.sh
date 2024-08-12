@@ -21,10 +21,7 @@ if [[ $last_commit == *"$autobot_commit"* ]]; then
 fi
 
 no_chart_dir=("." ".ci" ".dist" "packaged")
-changed_dirs=$(git diff HEAD~1 --name-only | xargs dirname | xargs dirname | sort | uniq)
-if [[ "$changed_dirs" == "." ]]; then
-  changed_dirs=$(git diff HEAD~1 --name-only | xargs dirname | sort | uniq)
-fi
+changed_dirs=$(git diff HEAD~1 --name-only | rev | xargs basename | rev | sort | uniq)
 
 echo "======================================================="
 echo "$(git log --pretty=format:"%h %s" -1)"
