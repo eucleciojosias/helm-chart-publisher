@@ -29,7 +29,7 @@ git diff HEAD~1 --name-only
 echo "======================================================="
 
 for chart_dir in $changed_dirs; do
-  if [[ $(echo ${no_chart_dir[@]} | fgrep -w $chart_dir) ]]; then
+  if [[ $(echo "${no_chart_dir[@]}" | fgrep -w $chart_dir) ]]; then
     continue
   fi
 

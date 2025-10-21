@@ -1,30 +1,57 @@
 image:
-  name: atlassian/pipelines-awscli:latest
+  name: public.ecr.aws/example/helm-chart-publisher-builder:latest
 
 pipelines:
   branches:
     main:
     - step:
+        name: Configure AWS Credentials
+        oidc: true
+        script:
+          - /aws-oidc-login.sh
+        artifacts:
+          - web-identity-token
+
+    - step:
+        name: Lint
+        image: koalaman/shellcheck-alpine:latest
+        script:
+          - shellcheck --severity=warning ./*.sh
+        after-script:
+          - if [[ BITBUCKET_EXIT_CODE -eq 0 ]]; then exit 0; fi
+          - pipe: atlassian/slack-notify:2.3.1
+            variables:
+              WEBHOOK_URL: '$SITE_DEPLOYMENTS_SLACK_WEBHOOK_URL'
+              MESSAGE: '$BITBUCKET_REPO_SLUG:$BITBUCKET_BRANCH Bitbucket Pipeline (Lint) exit code: $BITBUCKET_EXIT_CODE'
+
+    - step:
         name: Build and Push
         condition:
           changesets:
             includePaths:
+              - "bitbucket-pipelines.yml"
               - ".dockerignore"
               - "Dockerfile"
               - "pack.sh"
               - "pipe.yml"
         script:
+        - /aws-oidc-login.sh
+        - export DOCKER_BUILDKIT=0
+
         - IMAGE_NAME=public.ecr.aws/example/$BITBUCKET_REPO_SLUG
         - IMAGE_TAG=latest
+
         - |
           aws ecr get-login-password --region us-east-1 | docker login \
             --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
         - docker build -t "$IMAGE_NAME:$IMAGE_TAG" .
+
         - |
           aws ecr-public get-login-password --region us-east-1 | docker login \
             --username AWS --password-stdin public.ecr.aws
           aws ecr-public describe-repositories --repository-names ${BITBUCKET_REPO_SLUG} ||
             aws ecr-public create-repository --repository-name $BITBUCKET_REPO_SLUG
+
         - docker push "$IMAGE_NAME:$IMAGE_TAG"
         services:
           - docker
