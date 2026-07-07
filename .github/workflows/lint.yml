@@ -1,0 +1,20 @@
+name: Lint
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "pack.sh"
+      - ".github/workflows/lint.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Shellcheck
+        run: shellcheck --severity=warning ./*.sh

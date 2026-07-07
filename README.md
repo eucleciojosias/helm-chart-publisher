@@ -12,6 +12,4 @@ The pipe will:
 - commit the new packages and the new index
 - push to the current branch
 
-Source is hosted on GitHub; the Docker image is built by GitHub Actions
-(`.github/workflows/build.yml`) and published to the GitHub Container
-Registry.
+Source is hosted on GitHub.
