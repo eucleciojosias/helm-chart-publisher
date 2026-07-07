@@ -1,6 +1,4 @@
 README.md
 .gitignore
-bitbucket-pipelines.yaml
 dist/
 .dist/
-pipe.yaml

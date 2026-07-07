@@ -1,14 +1,7 @@
 #!/usr/bin/env bash
 
 set -e
-printf "
-  ____ ___ ____  _____    _    ____  __  __
- / ___|_ _|  _ \| ____|  / \  |  _ \|  \/  |
- \___ \| || | | |  _|   / _ \ | |_) | |\/| |
-  ___) | || |_| | |___ / ___ \|  _ <| |  | |
- |____/___|____/|_____/_/   \_\_| \_\_|  |_|
-
-"
+printf "\n== Helm Chart Publisher ==\n\n"
 
 git config --global --add safe.directory /opt/atlassian/pipelines/agent/build
 
