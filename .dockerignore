@@ -1,4 +1,13 @@
+.git/
+.github/
+.claude/
 README.md
 .gitignore
-dist/
-.dist/
+.dockerignore
+
+# macOS
+.DS_Store
+
+# Local test output from running publish.sh
+published/
+*.tgz
