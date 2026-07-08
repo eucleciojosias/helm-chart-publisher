@@ -5,6 +5,6 @@ RUN apk add --no-cache bash git helm jq py3-pip \
 
 WORKDIR /
 
-COPY ./pack.sh /
+COPY ./publish.sh /
 
-ENTRYPOINT ["/pack.sh"]
+ENTRYPOINT ["/publish.sh"]

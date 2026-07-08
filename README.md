@@ -7,7 +7,7 @@ The pipe will:
 - check if any chart changed in the last commit
 - for each chart changed:
   - increase a minor version from the last package
-  - generate a new package into `packaged/`
+  - generate a new package into `published/`
 - update the Helm repo index
 - commit the new packages and the new index
 - push to the current branch

@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "pack.sh"
+      - "publish.sh"
       - ".github/workflows/lint.yml"
 
 permissions:
